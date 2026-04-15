@@ -1,6 +1,3 @@
--- =======================================================
--- ADVENTUREWORKS OLAP DATABASE SCHEMA (SNOWFLAKE DESIGN)
--- =======================================================
 CREATE DATABASE IF NOT EXISTS adventureworks;
 USE adventureworks;
 DROP TABLE IF EXISTS fact_returns;
