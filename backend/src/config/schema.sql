@@ -28,7 +28,7 @@ CREATE TABLE dim_calendar (
 
 -- TERRITORY DIMENSION
 CREATE TABLE dim_territory (
-    TerritoryKey INT PRIMARY KEY,
+    SalesTerritoryKey INT PRIMARY KEY,
     Region VARCHAR(50),
     Country VARCHAR(50),
     Continent VARCHAR(50)
