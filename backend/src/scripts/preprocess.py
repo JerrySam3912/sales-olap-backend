@@ -4,14 +4,12 @@ import os
 import glob
 import re
 
-# 1. PATH CONFIGURATION
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 RAW_DATA_PATH = os.path.join(BASE_DIR, 'data', 'raw')
 CLEAN_DATA_PATH = os.path.join(BASE_DIR, 'data', 'cleaned')
 os.makedirs(CLEAN_DATA_PATH, exist_ok=True)
 
-# 2. FILE LOADING FUNCTION
 def load_data():
     print(f"Loading raw datasets from: {RAW_DATA_PATH}")
     csv_files = glob.glob(os.path.join(RAW_DATA_PATH, '*.csv'))

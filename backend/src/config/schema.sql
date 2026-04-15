@@ -52,13 +52,13 @@ CREATE TABLE dim_customer (
     FullName VARCHAR(150)
 );
 
--- PRODUCT CATEGORY (Top of the Snowflake)
+-- PRODUCT CATEGORY 
 CREATE TABLE dim_product_category (
     ProductCategoryKey INT PRIMARY KEY,
     CategoryName VARCHAR(50)
 );
 
--- PRODUCT SUBCATEGORY (Middle of the Snowflake)
+-- PRODUCT SUBCATEGORY 
 CREATE TABLE dim_product_subcategory (
     ProductSubcategoryKey INT PRIMARY KEY,
     SubcategoryName VARCHAR(50),
@@ -66,7 +66,7 @@ CREATE TABLE dim_product_subcategory (
     FOREIGN KEY (ProductCategoryKey) REFERENCES dim_product_category(ProductCategoryKey)
 );
 
--- PRODUCT DIMENSION (Bottom of the Snowflake)
+-- PRODUCT DIMENSION 
 CREATE TABLE dim_product (
     ProductKey INT PRIMARY KEY,
     ProductSubcategoryKey INT,
@@ -95,7 +95,6 @@ CREATE TABLE fact_sales (
     OrderLineItem INT,
     OrderQuantity INT,
     FOREIGN KEY (OrderDate) REFERENCES dim_calendar(Date),
-    FOREIGN KEY (StockDate) REFERENCES dim_calendar(Date),
     FOREIGN KEY (ProductKey) REFERENCES dim_product(ProductKey),
     FOREIGN KEY (CustomerKey) REFERENCES dim_customer(CustomerKey),
     FOREIGN KEY (TerritoryKey) REFERENCES dim_territory(TerritoryKey)

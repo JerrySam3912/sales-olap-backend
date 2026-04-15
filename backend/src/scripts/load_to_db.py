@@ -3,10 +3,8 @@ from sqlalchemy import create_engine
 import os
 from dotenv import load_dotenv
 
-# ==========================================
-# 1. SETUP & CONFIGURATION
-# ==========================================
-# Load .env from the backend/ root (two levels up from src/scripts/)
+
+
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 load_dotenv(dotenv_path=os.path.join(BASE_DIR, '.env'))
 
@@ -15,22 +13,15 @@ DB_PASS = os.getenv("DB_PASSWORD")
 DB_HOST = os.getenv("DB_HOST")
 DB_NAME = os.getenv("DB_NAME")
 
-# Validate that credentials loaded correctly
 if not all([DB_USER, DB_PASS, DB_HOST, DB_NAME]):
     raise ValueError("Missing one or more database credentials. Check your .env file.")
 
-# Create the SQLAlchemy Engine
-# Using mysql+mysqlconnector to support caching_sha2_password (MySQL 8+)
 connection_string = f"mysql+mysqlconnector://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
 engine = create_engine(connection_string)
 
 # Paths
 CLEAN_DATA_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'cleaned'))
 
-# ==========================================
-# 2. THE INSERTION ORDER (CRITICAL)
-# ==========================================
-# We MUST load Dimensions first, then subcategories, then Facts to satisfy Foreign Keys.
 TABLE_ORDER = [
     'dim_calendar',
     'dim_territory',
@@ -42,9 +33,6 @@ TABLE_ORDER = [
     'fact_return'
 ]
 
-# ==========================================
-# 3. EXECUTE UPLOAD
-# ==========================================
 def load_data_to_mysql():
     print(f"Connecting to MySQL Database: {DB_NAME}...")
 
