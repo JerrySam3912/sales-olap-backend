@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node --input-type=module --eval ' *)",
+      "Bash(npm run *)",
+      "Bash(curl -s 'http://localhost:5000/api/v1/analytics/revenue-trending?layer=month&year=2021')",
+      "Bash(curl -s 'http://localhost:5000/api/v1/analytics/top-products?limit=3')",
+      "Bash(curl -s 'http://localhost:5000/api/v1/analytics/sales-by-category?year=2021&country=Australia')"
+    ]
+  }
+}
