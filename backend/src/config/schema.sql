@@ -94,7 +94,7 @@ CREATE TABLE fact_sales (
     FOREIGN KEY (OrderDate) REFERENCES dim_calendar(Date),
     FOREIGN KEY (ProductKey) REFERENCES dim_product(ProductKey),
     FOREIGN KEY (CustomerKey) REFERENCES dim_customer(CustomerKey),
-    FOREIGN KEY (TerritoryKey) REFERENCES dim_territory(TerritoryKey)
+    FOREIGN KEY (SalesTerritoryKey) REFERENCES dim_territory(SalesTerritoryKey)
 );
 
 -- RETURNS FACT TABLE
@@ -104,6 +104,6 @@ CREATE TABLE fact_return (
     ProductKey INT,
     ReturnQuantity INT,
     FOREIGN KEY (ReturnDate) REFERENCES dim_calendar(Date),
-    FOREIGN KEY (TerritoryKey) REFERENCES dim_territory(TerritoryKey),
+    FOREIGN KEY (SalesTerritoryKey) REFERENCES dim_territory(SalesTerritoryKey),
     FOREIGN KEY (ProductKey) REFERENCES dim_product(ProductKey)
 );
