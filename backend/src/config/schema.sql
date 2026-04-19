@@ -88,7 +88,7 @@ CREATE TABLE fact_sales (
     OrderNumber VARCHAR(50),
     ProductKey INT,
     CustomerKey INT,
-    TerritoryKey INT,
+    SalesTerritoryKey INT,
     OrderLineItem INT,
     OrderQuantity INT,
     FOREIGN KEY (OrderDate) REFERENCES dim_calendar(Date),
@@ -100,7 +100,7 @@ CREATE TABLE fact_sales (
 -- RETURNS FACT TABLE
 CREATE TABLE fact_return (
     ReturnDate DATE,
-    TerritoryKey INT,
+    SalesTerritoryKey INT,
     ProductKey INT,
     ReturnQuantity INT,
     FOREIGN KEY (ReturnDate) REFERENCES dim_calendar(Date),
