@@ -1,4 +1,4 @@
-ReturnDate,TerritoryKey,ProductKey,ReturnQuantity
+ReturnDate,SalesTerritoryKey,ProductKey,ReturnQuantity
 2020-01-18,9,312,1
 2020-01-18,10,310,1
 2020-01-21,8,346,1

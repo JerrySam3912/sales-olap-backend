@@ -53,7 +53,8 @@ def run_preprocessing():
     if cust_df is not None:
         processed_keys.append(cust_key)
         print(" -> Cleaning Customers...")
-        cust_df = cust_df.dropna(subset=['CustomerKey', 'AnnualIncome', 'Gender'])
+        cust_df = cust_df.fillna({'Gender': 'U', 'Prefix':'Unknown'})
+        cust_df = cust_df.dropna(subset=['CustomerKey', 'AnnualIncome'])
         
         names = ['Prefix', 'FirstName', 'LastName']
         for col in names:
@@ -61,6 +62,7 @@ def run_preprocessing():
             
         cust_df['FullName'] = (cust_df['Prefix'] + " " + cust_df['FirstName'] + " " + cust_df['LastName']).str.strip()
         cust_df['BirthDate'] = pd.to_datetime(cust_df['BirthDate']).dt.date
+        cust_df['CustomerKey'] = cust_df['CustomerKey'].astype(int)
         cust_df.to_csv(os.path.join(CLEAN_DATA_PATH, 'dim_customer.csv'), index=False)
 
     # clean calendar
@@ -80,7 +82,16 @@ def run_preprocessing():
         cal_df['Year'] = cal_df['Date'].dt.year
         cal_df['Date'] = cal_df['Date'].dt.date
         cal_df.to_csv(os.path.join(CLEAN_DATA_PATH, 'dim_calendar.csv'), index=False)
-
+        
+    print(" -> Cleaning Returns...")
+    ret_key = 'adventureworks_returns_data'
+    ret_df = dfs.get(ret_key)
+    if ret_df is not None:
+        processed_keys.append(ret_key)
+        ret_df = ret_df.rename(columns={'TerritoryKey': 'SalesTerritoryKey'})
+        ret_df['ReturnDate'] = pd.to_datetime(ret_df['ReturnDate']).dt.date
+        ret_df.to_csv(os.path.join(CLEAN_DATA_PATH, 'fact_return.csv'), index=False)
+        
     # clean and combine sales data
     print(" -> Cleaning and Combining Sales Data...")
     sales_frames = []
@@ -92,10 +103,16 @@ def run_preprocessing():
             processed_keys.append(sales_key)
             sales_df['OrderDate'] = pd.to_datetime(sales_df['OrderDate'], format='mixed', dayfirst=True).dt.date
             sales_df['StockDate'] = pd.to_datetime(sales_df['StockDate'], format='mixed', dayfirst=True).dt.date
+            sales_df = sales_df.rename(columns={'TerritoryKey': 'SalesTerritoryKey'})
             sales_frames.append(sales_df)
     
     if sales_frames:
         fact_sales = pd.concat(sales_frames, ignore_index=True)
+        if cust_df is not None:
+            initial_count = len(fact_sales)
+            valid_keys = cust_df['CustomerKey'].unique()
+            fact_sales = fact_sales[fact_sales['CustomerKey'].isin(valid_keys)]
+            print(f"Filtered Sales: Dropped {initial_count - len(fact_sales)} orphan records.")
         fact_sales.to_csv(os.path.join(CLEAN_DATA_PATH, 'fact_sales.csv'), index=False)
 
     for key, df in dfs.items():

@@ -1,4 +1,4 @@
-OrderDate,StockDate,OrderNumber,ProductKey,CustomerKey,TerritoryKey,OrderLineItem,OrderQuantity
+OrderDate,StockDate,OrderNumber,ProductKey,CustomerKey,SalesTerritoryKey,OrderLineItem,OrderQuantity
 2020-01-01,2019-09-21,SO45080,332,14657,1,1,1
 2020-01-01,2019-12-05,SO45079,312,29255,4,1,1
 2020-01-01,2019-10-29,SO45082,350,11455,9,1,1

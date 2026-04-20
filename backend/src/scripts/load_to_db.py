@@ -16,7 +16,7 @@ DB_NAME = os.getenv("DB_NAME")
 if not all([DB_USER, DB_PASS, DB_HOST, DB_NAME]):
     raise ValueError("Missing one or more database credentials. Check your .env file.")
 
-connection_string = f"mysql+mysqlconnector://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
+connection_string = f"mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
 engine = create_engine(connection_string)
 
 # Paths
