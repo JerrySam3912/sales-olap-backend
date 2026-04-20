@@ -4,11 +4,11 @@ export const getOverviewQuery = async () => {
   const sql = `
     SELECT
       (SELECT COUNT(*) FROM fact_sales) AS total_orders,
-      (SELECT COALESCE(SUM(order_quantity), 0) FROM fact_sales) AS total_quantity_sold,
-      (SELECT COALESCE(SUM(return_quantity), 0) FROM fact_returns) AS total_return_quantity,
+      (SELECT COALESCE(SUM(OrderQuantity), 0) FROM fact_sales) AS total_quantity_sold,
+      (SELECT COALESCE(SUM(ReturnQuantity), 0) FROM fact_return) AS total_return_quantity,
       (SELECT COUNT(*) FROM dim_product) AS total_products,
       (SELECT COUNT(*) FROM dim_customer) AS total_customers,
-      (SELECT COUNT(DISTINCT country) FROM dim_territory) AS total_countries
+      (SELECT COUNT(DISTINCT Country) FROM dim_territory) AS total_countries
   `;
 
   const rows = await query(sql);
@@ -18,13 +18,13 @@ export const getOverviewQuery = async () => {
 export const getSalesByYearQuery = async () => {
   const sql = `
     SELECT
-      dd.year,
-      SUM(fs.order_quantity) AS total_quantity_sold
+      dd.Year AS year,
+      SUM(fs.OrderQuantity) AS total_quantity_sold
     FROM fact_sales fs
-    INNER JOIN dim_date dd
-      ON fs.order_date = dd.full_date
-    GROUP BY dd.year
-    ORDER BY dd.year ASC
+    INNER JOIN dim_calendar dd
+      ON fs.OrderDate = dd.Date
+    GROUP BY dd.Year
+    ORDER BY dd.Year ASC
   `;
 
   return query(sql);
@@ -35,22 +35,22 @@ export const getSalesByMonthQuery = async (year) => {
   let whereClause = '';
 
   if (year) {
-    whereClause = 'WHERE dd.year = ?';
+    whereClause = 'WHERE dd.Year = ?';
     params.push(Number(year));
   }
 
   const sql = `
     SELECT
-      dd.year,
-      dd.month,
-      dd.month_name,
-      SUM(fs.order_quantity) AS total_quantity_sold
+      dd.Year AS year,
+      dd.MonthNumber AS month,
+      dd.MonthName AS month_name,
+      SUM(fs.OrderQuantity) AS total_quantity_sold
     FROM fact_sales fs
-    INNER JOIN dim_date dd
-      ON fs.order_date = dd.full_date
+    INNER JOIN dim_calendar dd
+      ON fs.OrderDate = dd.Date
     ${whereClause}
-    GROUP BY dd.year, dd.month, dd.month_name
-    ORDER BY dd.year ASC, dd.month ASC
+    GROUP BY dd.Year, dd.MonthNumber, dd.MonthName
+    ORDER BY dd.Year ASC, dd.MonthNumber ASC
   `;
 
   return query(sql, params);
@@ -59,15 +59,15 @@ export const getSalesByMonthQuery = async (year) => {
 export const getTopProductsQuery = async (limit) => {
   const sql = `
     SELECT
-      dp.product_key,
-      dp.product_name,
-      dp.model_name,
-      SUM(fs.order_quantity) AS total_quantity_sold
+      dp.ProductKey AS product_key,
+      dp.ProductName AS product_name,
+      dp.ModelName AS model_name,
+      SUM(fs.OrderQuantity) AS total_quantity_sold
     FROM fact_sales fs
     INNER JOIN dim_product dp
-      ON fs.product_key = dp.product_key
-    GROUP BY dp.product_key, dp.product_name, dp.model_name
-    ORDER BY total_quantity_sold DESC, dp.product_name ASC
+      ON fs.ProductKey = dp.ProductKey
+    GROUP BY dp.ProductKey, dp.ProductName, dp.ModelName
+    ORDER BY total_quantity_sold DESC, dp.ProductName ASC
     LIMIT ?
   `;
 
@@ -77,14 +77,14 @@ export const getTopProductsQuery = async (limit) => {
 export const getSalesByCountryQuery = async () => {
   const sql = `
     SELECT
-      dt.country,
-      dt.region,
-      SUM(fs.order_quantity) AS total_quantity_sold
+      dt.Country AS country,
+      dt.Region AS region,
+      SUM(fs.OrderQuantity) AS total_quantity_sold
     FROM fact_sales fs
     INNER JOIN dim_territory dt
-      ON fs.territory_key = dt.territory_key
-    GROUP BY dt.country, dt.region
-    ORDER BY total_quantity_sold DESC, dt.country ASC
+      ON fs.SalesTerritoryKey = dt.SalesTerritoryKey
+    GROUP BY dt.Country, dt.Region
+    ORDER BY total_quantity_sold DESC, dt.Country ASC
   `;
 
   return query(sql);
@@ -95,12 +95,12 @@ export const getSalesByCategoryQuery = async (year, country) => {
   const conditions = [];
 
   if (year) {
-    conditions.push('dd.year = ?');
+    conditions.push('dd.Year = ?');
     params.push(Number(year));
   }
 
   if (country) {
-    conditions.push('dt.country = ?');
+    conditions.push('dt.Country = ?');
     params.push(country);
   }
 
@@ -108,22 +108,22 @@ export const getSalesByCategoryQuery = async (year, country) => {
 
   const sql = `
     SELECT
-      dpc.category_name,
-      SUM(fs.order_quantity) AS total_quantity_sold
+      dpc.CategoryName AS category_name,
+      SUM(fs.OrderQuantity) AS total_quantity_sold
     FROM fact_sales fs
     INNER JOIN dim_product dp
-      ON fs.product_key = dp.product_key
+      ON fs.ProductKey = dp.ProductKey
     INNER JOIN dim_product_subcategory dps
-      ON dp.product_subcategory_key = dps.product_subcategory_key
+      ON dp.ProductSubcategoryKey = dps.ProductSubcategoryKey
     INNER JOIN dim_product_category dpc
-      ON dps.product_category_key = dpc.product_category_key
+      ON dps.ProductCategoryKey = dpc.ProductCategoryKey
     INNER JOIN dim_territory dt
-      ON fs.territory_key = dt.territory_key
-    INNER JOIN dim_date dd
-      ON fs.order_date = dd.full_date
+      ON fs.SalesTerritoryKey = dt.SalesTerritoryKey
+    INNER JOIN dim_calendar dd
+      ON fs.OrderDate = dd.Date
     ${whereClause}
-    GROUP BY dpc.category_name
-    ORDER BY total_quantity_sold DESC, dpc.category_name ASC
+    GROUP BY dpc.CategoryName
+    ORDER BY total_quantity_sold DESC, dpc.CategoryName ASC
   `;
 
   return query(sql, params);
@@ -132,14 +132,14 @@ export const getSalesByCategoryQuery = async (year, country) => {
 export const getReturnsByProductQuery = async (limit) => {
   const sql = `
     SELECT
-      dp.product_key,
-      dp.product_name,
-      SUM(fr.return_quantity) AS total_return_quantity
-    FROM fact_returns fr
+      dp.ProductKey AS product_key,
+      dp.ProductName AS product_name,
+      SUM(fr.ReturnQuantity) AS total_return_quantity
+    FROM fact_return fr
     INNER JOIN dim_product dp
-      ON fr.product_key = dp.product_key
-    GROUP BY dp.product_key, dp.product_name
-    ORDER BY total_return_quantity DESC, dp.product_name ASC
+      ON fr.ProductKey = dp.ProductKey
+    GROUP BY dp.ProductKey, dp.ProductName
+    ORDER BY total_return_quantity DESC, dp.ProductName ASC
     LIMIT ?
   `;
 
@@ -149,7 +149,7 @@ export const getReturnsByProductQuery = async (limit) => {
 export const getReturnRateQuery = async (limit) => {
   const sql = `
     SELECT
-      dp.product_name,
+      dp.ProductName AS product_name,
       COALESCE(sales.sold_quantity, 0) AS sold_quantity,
       COALESCE(returns.return_quantity, 0) AS return_quantity,
       CASE
@@ -159,22 +159,22 @@ export const getReturnRateQuery = async (limit) => {
     FROM dim_product dp
     LEFT JOIN (
       SELECT
-        product_key,
-        SUM(order_quantity) AS sold_quantity
+        ProductKey,
+        SUM(OrderQuantity) AS sold_quantity
       FROM fact_sales
-      GROUP BY product_key
+      GROUP BY ProductKey
     ) sales
-      ON dp.product_key = sales.product_key
+      ON dp.ProductKey = sales.ProductKey
     LEFT JOIN (
       SELECT
-        product_key,
-        SUM(return_quantity) AS return_quantity
-      FROM fact_returns
-      GROUP BY product_key
+        ProductKey,
+        SUM(ReturnQuantity) AS return_quantity
+      FROM fact_return
+      GROUP BY ProductKey
     ) returns
-      ON dp.product_key = returns.product_key
+      ON dp.ProductKey = returns.ProductKey
     WHERE COALESCE(sales.sold_quantity, 0) > 0
-    ORDER BY return_rate DESC, return_quantity DESC, dp.product_name ASC
+    ORDER BY return_rate DESC, return_quantity DESC, dp.ProductName ASC
     LIMIT ?
   `;
 
@@ -186,17 +186,17 @@ export const getSalesDetailQuery = async ({ year, country, category, limit, offs
   const conditions = [];
 
   if (year) {
-    conditions.push('dd.year = ?');
+    conditions.push('dd.Year = ?');
     params.push(Number(year));
   }
 
   if (country) {
-    conditions.push('dt.country = ?');
+    conditions.push('dt.Country = ?');
     params.push(country);
   }
 
   if (category) {
-    conditions.push('dpc.category_name = ?');
+    conditions.push('dpc.CategoryName = ?');
     params.push(category);
   }
 
@@ -204,38 +204,37 @@ export const getSalesDetailQuery = async ({ year, country, category, limit, offs
 
   const sql = `
     SELECT
-      fs.sales_key,
-      fs.order_number,
-      fs.order_line_item,
-      fs.order_quantity,
-      dd.year,
-      dd.month,
-      dd.month_name,
-      dd.full_date AS order_date,
-      dp.product_name,
-      dp.model_name,
-      dpc.category_name,
-      CONCAT(dc.first_name, ' ', dc.last_name) AS customer_name,
-      dc.gender,
-      dc.occupation,
-      dt.country,
-      dt.region,
-      dt.continent
+      fs.OrderNumber AS order_number,
+      fs.OrderLineItem AS order_line_item,
+      fs.OrderQuantity AS order_quantity,
+      dd.Year AS year,
+      dd.MonthNumber AS month,
+      dd.MonthName AS month_name,
+      dd.Date AS order_date,
+      dp.ProductName AS product_name,
+      dp.ModelName AS model_name,
+      dpc.CategoryName AS category_name,
+      CONCAT(dc.FirstName, ' ', dc.LastName) AS customer_name,
+      dc.Gender AS gender,
+      dc.Occupation AS occupation,
+      dt.Country AS country,
+      dt.Region AS region,
+      dt.Continent AS continent
     FROM fact_sales fs
     INNER JOIN dim_product dp
-      ON fs.product_key = dp.product_key
+      ON fs.ProductKey = dp.ProductKey
     INNER JOIN dim_product_subcategory dps
-      ON dp.product_subcategory_key = dps.product_subcategory_key
+      ON dp.ProductSubcategoryKey = dps.ProductSubcategoryKey
     INNER JOIN dim_product_category dpc
-      ON dps.product_category_key = dpc.product_category_key
+      ON dps.ProductCategoryKey = dpc.ProductCategoryKey
     INNER JOIN dim_customer dc
-      ON fs.customer_key = dc.customer_key
+      ON fs.CustomerKey = dc.CustomerKey
     INNER JOIN dim_territory dt
-      ON fs.territory_key = dt.territory_key
-    INNER JOIN dim_date dd
-      ON fs.order_date = dd.full_date
+      ON fs.SalesTerritoryKey = dt.SalesTerritoryKey
+    INNER JOIN dim_calendar dd
+      ON fs.OrderDate = dd.Date
     ${whereClause}
-    ORDER BY dd.year DESC, dd.month DESC, fs.sales_key DESC
+    ORDER BY dd.Year DESC, dd.MonthNumber DESC, fs.OrderNumber DESC, fs.OrderLineItem DESC
     LIMIT ? OFFSET ?
   `;
 
@@ -247,17 +246,17 @@ export const getSalesDetailCountQuery = async ({ year, country, category }) => {
   const conditions = [];
 
   if (year) {
-    conditions.push('dd.year = ?');
+    conditions.push('dd.Year = ?');
     params.push(Number(year));
   }
 
   if (country) {
-    conditions.push('dt.country = ?');
+    conditions.push('dt.Country = ?');
     params.push(country);
   }
 
   if (category) {
-    conditions.push('dpc.category_name = ?');
+    conditions.push('dpc.CategoryName = ?');
     params.push(category);
   }
 
@@ -267,15 +266,15 @@ export const getSalesDetailCountQuery = async ({ year, country, category }) => {
     SELECT COUNT(*) AS total_records
     FROM fact_sales fs
     INNER JOIN dim_product dp
-      ON fs.product_key = dp.product_key
+      ON fs.ProductKey = dp.ProductKey
     INNER JOIN dim_product_subcategory dps
-      ON dp.product_subcategory_key = dps.product_subcategory_key
+      ON dp.ProductSubcategoryKey = dps.ProductSubcategoryKey
     INNER JOIN dim_product_category dpc
-      ON dps.product_category_key = dpc.product_category_key
+      ON dps.ProductCategoryKey = dpc.ProductCategoryKey
     INNER JOIN dim_territory dt
-      ON fs.territory_key = dt.territory_key
-    INNER JOIN dim_date dd
-      ON fs.order_date = dd.full_date
+      ON fs.SalesTerritoryKey = dt.SalesTerritoryKey
+    INNER JOIN dim_calendar dd
+      ON fs.OrderDate = dd.Date
     ${whereClause}
   `;
 
