@@ -1,6 +1,7 @@
 import {
   getOverviewQuery,
   getReturnRateQuery,
+  getReturnsByMonthQuery,
   getReturnsByProductQuery,
   getSalesByCategoryQuery,
   getSalesByCountryQuery,
@@ -38,8 +39,12 @@ export const getSalesByCountry = async () => {
   return getSalesByCountryQuery();
 };
 
-export const getSalesByCategory = async ({ year, country }) => {
-  return getSalesByCategoryQuery(year, country);
+export const getSalesByCategory = async ({ year, country, subcategory }) => {
+  return getSalesByCategoryQuery(year, country, subcategory);
+};
+
+export const getReturnsByMonth = async (year) => {
+  return getReturnsByMonthQuery(year);
 };
 
 export const getReturnsByProduct = async (limit) => {

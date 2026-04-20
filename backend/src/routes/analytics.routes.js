@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   getOverview,
   getReturnRate,
+  getReturnsByMonth,
   getReturnsByProduct,
   getSalesByCategory,
   getSalesByCountry,
@@ -26,6 +27,7 @@ router.get('/top-products', validateLimitQuery, getTopProducts);
 router.get('/sales-by-country', getSalesByCountry);
 router.get('/sales-by-category', validateSalesByCategoryQuery, getSalesByCategory);
 router.get('/returns-by-product', validateLimitQuery, getReturnsByProduct);
+router.get('/returns-by-month', validateSalesByMonthQuery, getReturnsByMonth);
 router.get('/return-rate', validateLimitQuery, getReturnRate);
 router.get('/sales-detail', validateSalesDetailQuery, getSalesDetail);
 

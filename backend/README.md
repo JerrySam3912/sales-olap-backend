@@ -1,6 +1,6 @@
 # Sales OLAP Backend
 
-Backend REST API for dashboard and analytics consumption on top of the existing MySQL data warehouse `adventureworks_olap`.
+Backend REST API for dashboard and analytics consumption on top of the existing MySQL data warehouse `adventureworks`.
 
 ## Tech Stack
 
@@ -56,7 +56,7 @@ DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=your_mysql_password
-DB_NAME=adventureworks_olap
+DB_NAME=adventureworks
 DB_CONNECTION_LIMIT=10
 ```
 
@@ -153,6 +153,15 @@ Optional query params:
 
 - `year`
 - `country`
+- `subcategory`
+
+### Returns By Month
+
+`GET /analytics/returns-by-month`
+
+Optional query params:
+
+- `year`
 
 ### Returns By Product
 
@@ -264,3 +273,5 @@ Example paginated response from `sales-detail`:
 - `http://localhost:5000/api/v1/analytics/sales-by-year`
 - `http://localhost:5000/api/v1/analytics/top-products?limit=5`
 - `http://localhost:5000/api/v1/analytics/sales-detail?page=1&limit=5`
+- `http://localhost:5000/api/v1/analytics/returns-by-month?year=2022`
+- `http://localhost:5000/api/v1/analytics/sales-by-category?year=2022&subcategory=Road%20Bikes`

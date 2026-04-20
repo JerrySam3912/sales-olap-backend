@@ -47,7 +47,7 @@ export const validateLimitQuery = (req, res, next) => {
 };
 
 export const validateSalesByCategoryQuery = (req, res, next) => {
-  const { year, country } = req.query;
+  const { year, country, subcategory } = req.query;
 
   if (!isValidYear(year)) {
     return sendValidationError(res, 'Query parameter "year" must be a valid year.');
@@ -55,6 +55,10 @@ export const validateSalesByCategoryQuery = (req, res, next) => {
 
   if (!isNonEmptyString(country)) {
     return sendValidationError(res, 'Query parameter "country" must be a non-empty string.');
+  }
+
+  if (!isNonEmptyString(subcategory)) {
+    return sendValidationError(res, 'Query parameter "subcategory" must be a non-empty string.');
   }
 
   return next();

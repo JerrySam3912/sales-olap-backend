@@ -54,8 +54,18 @@ export const getSalesByCountry = async (req, res) => {
 
 export const getSalesByCategory = async (req, res) => {
   try {
-    const { year, country } = req.query;
-    const data = await analyticsService.getSalesByCategory({ year, country });
+    const { year, country, subcategory } = req.query;
+    const data = await analyticsService.getSalesByCategory({ year, country, subcategory });
+    return sendSuccess(res, data);
+  } catch (error) {
+    return sendError(res);
+  }
+};
+
+export const getReturnsByMonth = async (req, res) => {
+  try {
+    const { year } = req.query;
+    const data = await analyticsService.getReturnsByMonth(year);
     return sendSuccess(res, data);
   } catch (error) {
     return sendError(res);
