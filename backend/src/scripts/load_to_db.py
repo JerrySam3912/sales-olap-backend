@@ -2,6 +2,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 import os
 from dotenv import load_dotenv
+from urllib.parse import quote_plus
 
 
 
@@ -16,7 +17,12 @@ DB_NAME = os.getenv("DB_NAME")
 if not all([DB_USER, DB_PASS, DB_HOST, DB_NAME]):
     raise ValueError("Missing one or more database credentials. Check your .env file.")
 
-connection_string = f"mysql+pymysql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
+connection_string = (
+    f"mysql+pymysql://{DB_USER}:{quote_plus(DB_PASS)}"
+    f"@{DB_HOST}:{os.getenv('DB_PORT')}/{DB_NAME}"
+)
+
+
 engine = create_engine(connection_string)
 
 # Paths
