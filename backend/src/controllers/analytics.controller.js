@@ -54,8 +54,44 @@ export const getSalesByCountry = async (req, res) => {
 
 export const getSalesByCategory = async (req, res) => {
   try {
-    const { year, country } = req.query;
-    const data = await analyticsService.getSalesByCategory({ year, country });
+    const { year, country, month, date } = req.query;
+    const data = await analyticsService.getSalesByCategory({ year, country, month, date });
+    return sendSuccess(res, data);
+  } catch (error) {
+    return sendError(res);
+  }
+};
+
+export const getExecutiveKPIs = async (req, res) => {
+  try {
+    const { year, month, date } = req.query;
+    const data = await analyticsService.getExecutiveKPIs({ year, month, date });
+    return sendSuccess(res, data);
+  } catch (error) {
+    return sendError(res);
+  }
+};
+
+export const getRevenueTrending = async (req, res) => {
+  try {
+    const { layer, year, month } = req.query;
+    const data = await analyticsService.getRevenueTrending({ layer, year, month });
+    return sendSuccess(res, data);
+  } catch (error) {
+    return sendError(res);
+  }
+};
+
+export const getCountryStats = async (req, res) => {
+  try {
+    const { year, month, date, limit, sortBy, sort_by: sortByLegacy } = req.query;
+    const data = await analyticsService.getCountryStats({
+      year,
+      month,
+      date,
+      limit,
+      sortBy: sortBy ?? sortByLegacy
+    });
     return sendSuccess(res, data);
   } catch (error) {
     return sendError(res);

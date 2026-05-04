@@ -12,3 +12,5 @@ pnpm-debug.log*
 Thumbs.db
 .vscode/
 .idea/
+__pycache__/
+*.pyc

@@ -50,8 +50,8 @@ export const buildPaginatedResponse = ({ rows, total, page, limit }) => {
     pagination: {
       page,
       limit,
-      total_records: totalRecords,
-      total_pages: totalPages
+      totalRecords,
+      totalPages
     }
   };
 };

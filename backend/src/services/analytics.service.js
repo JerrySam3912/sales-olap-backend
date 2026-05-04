@@ -1,5 +1,10 @@
 import {
+  getCountryStatsQuery,
+  getExecutiveReturnQuantityQuery,
+  getExecutiveSalesKPIsQuery,
+  getGlobalReturnRateQuery,
   getOverviewQuery,
+  getRevenueTrendingQuery,
   getReturnRateQuery,
   getReturnsByProductQuery,
   getSalesByCategoryQuery,
@@ -38,8 +43,37 @@ export const getSalesByCountry = async () => {
   return getSalesByCountryQuery();
 };
 
-export const getSalesByCategory = async ({ year, country }) => {
-  return getSalesByCategoryQuery(year, country);
+export const getSalesByCategory = async ({ year, country, month, date }) => {
+  return getSalesByCategoryQuery({ year, country, month, date });
+};
+
+export const getExecutiveKPIs = async ({ year, month, date }) => {
+  const [salesKPIs, returnQuantity, globalReturnRate] = await Promise.all([
+    getExecutiveSalesKPIsQuery({ year, month, date }),
+    getExecutiveReturnQuantityQuery({ year, month, date }),
+    getGlobalReturnRateQuery()
+  ]);
+
+  return {
+    ...salesKPIs,
+    totalReturnQuantity: Number(returnQuantity?.totalReturnQuantity) || 0,
+    globalReturnRate: Number(globalReturnRate?.globalReturnRate) || 0
+  };
+};
+
+export const getRevenueTrending = async ({ layer, year, month }) => {
+  return getRevenueTrendingQuery({ layer, year, month });
+};
+
+export const getCountryStats = async ({ year, month, date, limit, sortBy }) => {
+  const safeLimit = parseLimit(limit, 10);
+  return getCountryStatsQuery({
+    year,
+    month,
+    date,
+    limit: safeLimit,
+    sortBy
+  });
 };
 
 export const getReturnsByProduct = async (limit) => {
@@ -71,7 +105,7 @@ export const getSalesDetail = async ({ year, country, category, page, limit }) =
 
   return buildPaginatedResponse({
     rows,
-    total: totalResult.total_records,
+    total: totalResult.totalRecords,
     page: pagination.page,
     limit: pagination.limit
   });
