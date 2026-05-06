@@ -191,3 +191,13 @@ export const validateSalesDetailQuery = (req, res, next) => {
 
   return next();
 };
+
+export const validateProfitTrendingQuery = (req, res, next) => {
+  const { productKey } = req.query;
+
+  if (!isPositiveInteger(productKey)) {
+    return sendValidationError(res, 'Query parameter "productKey" must be a positive integer.');
+  }
+
+  return next();
+};

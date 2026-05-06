@@ -134,3 +134,59 @@ export const getSalesDetail = async (req, res) => {
     return sendError(res);
   }
 };
+
+export const getCustomerKPIs = async (req, res) => {
+  try {
+    const data = await analyticsService.getCustomerKPIs();
+    return sendSuccess(res, data);
+  } catch (error) {
+    return sendError(res);
+  }
+};
+
+export const getOrdersByGender = async (req, res) => {
+  try {
+    const data = await analyticsService.getOrdersByGender();
+    return sendSuccess(res, data);
+  } catch (error) {
+    return sendError(res);
+  }
+};
+
+export const getOrdersByOccupation = async (req, res) => {
+  try {
+    const data = await analyticsService.getOrdersByOccupation();
+    return sendSuccess(res, data);
+  } catch (error) {
+    return sendError(res);
+  }
+};
+
+export const getOrdersByIncomeLevel = async (req, res) => {
+  try {
+    const data = await analyticsService.getOrdersByIncomeLevel();
+    return sendSuccess(res, data);
+  } catch (error) {
+    return sendError(res);
+  }
+};
+
+export const getTopProductsByOrders = async (req, res) => {
+  try {
+    const { limit } = req.query;
+    const data = await analyticsService.getTopProductsByOrders(limit);
+    return sendSuccess(res, data);
+  } catch (error) {
+    return sendError(res);
+  }
+};
+
+export const getProfitTrending = async (req, res) => {
+  try {
+    const { productKey } = req.query;
+    const data = await analyticsService.getProfitTrending(productKey);
+    return sendSuccess(res, data);
+  } catch (error) {
+    return sendError(res);
+  }
+};

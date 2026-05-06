@@ -1,9 +1,14 @@
 import {
   getCountryStatsQuery,
+  getCustomerKPIsQuery,
   getExecutiveReturnQuantityQuery,
   getExecutiveSalesKPIsQuery,
   getGlobalReturnRateQuery,
+  getOrdersByGenderQuery,
+  getOrdersByIncomeLevelQuery,
+  getOrdersByOccupationQuery,
   getOverviewQuery,
+  getProfitTrendingQuery,
   getRevenueTrendingQuery,
   getReturnRateQuery,
   getReturnsByProductQuery,
@@ -13,6 +18,7 @@ import {
   getSalesByYearQuery,
   getSalesDetailCountQuery,
   getSalesDetailQuery,
+  getTopProductsByOrdersQuery,
   getTopProductsQuery
 } from '../queries/analytics.query.js';
 import { buildPaginatedResponse, getPagination } from '../utils/response.js';
@@ -109,4 +115,29 @@ export const getSalesDetail = async ({ year, country, category, page, limit }) =
     page: pagination.page,
     limit: pagination.limit
   });
+};
+
+export const getCustomerKPIs = async () => {
+  return getCustomerKPIsQuery();
+};
+
+export const getOrdersByGender = async () => {
+  return getOrdersByGenderQuery();
+};
+
+export const getOrdersByOccupation = async () => {
+  return getOrdersByOccupationQuery();
+};
+
+export const getOrdersByIncomeLevel = async () => {
+  return getOrdersByIncomeLevelQuery();
+};
+
+export const getTopProductsByOrders = async (limit) => {
+  const safeLimit = parseLimit(limit, 10);
+  return getTopProductsByOrdersQuery(safeLimit);
+};
+
+export const getProfitTrending = async (productKey) => {
+  return getProfitTrendingQuery(productKey);
 };
