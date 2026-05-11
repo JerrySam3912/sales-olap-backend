@@ -2,6 +2,8 @@ import { Router } from 'express';
 import {
   getCountryStats,
   getExecutiveKPIs,
+  getOrdersByIncomeLevel,
+  getOrdersByOccupation,
   getOverview,
   getRevenueTrending,
   getReturnRate,
@@ -37,5 +39,7 @@ router.get('/country-stats', validateCountryStatsQuery, getCountryStats);
 router.get('/returns-by-product', validateLimitQuery, getReturnsByProduct);
 router.get('/return-rate', validateLimitQuery, getReturnRate);
 router.get('/sales-detail', validateSalesDetailQuery, getSalesDetail);
+router.get('/orders-by-income-level', getOrdersByIncomeLevel);
+router.get('/orders-by-occupation', getOrdersByOccupation);
 
 export default router;

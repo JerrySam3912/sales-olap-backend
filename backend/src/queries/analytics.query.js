@@ -7,7 +7,7 @@ const buildTimeConditions = (year, month, date, alias = 'dd') => {
     conditions.push(`${alias}.full_date = ?`);
     params.push(date);
   } else {
-    if (year)  { conditions.push(`${alias}.year = ?`);  params.push(Number(year)); }
+    if (year) { conditions.push(`${alias}.year = ?`); params.push(Number(year)); }
     if (month) { conditions.push(`${alias}.month = ?`); params.push(Number(month)); }
   }
   return { conditions, params };
@@ -165,9 +165,9 @@ export const getSalesDetailQuery = async ({ year, country, category, limit, offs
   const params = [];
   const conditions = [];
 
-  if (year)     { conditions.push('dd.year = ?');              params.push(Number(year)); }
-  if (country)  { conditions.push('dt.country = ?');           params.push(country); }
-  if (category) { conditions.push('dpc.category_name = ?');    params.push(category); }
+  if (year) { conditions.push('dd.year = ?'); params.push(Number(year)); }
+  if (country) { conditions.push('dt.country = ?'); params.push(country); }
+  if (category) { conditions.push('dpc.category_name = ?'); params.push(category); }
 
   const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
 
@@ -208,9 +208,9 @@ export const getSalesDetailCountQuery = async ({ year, country, category }) => {
   const params = [];
   const conditions = [];
 
-  if (year)     { conditions.push('dd.year = ?');              params.push(Number(year)); }
-  if (country)  { conditions.push('dt.country = ?');           params.push(country); }
-  if (category) { conditions.push('dpc.category_name = ?');    params.push(category); }
+  if (year) { conditions.push('dd.year = ?'); params.push(Number(year)); }
+  if (country) { conditions.push('dt.country = ?'); params.push(country); }
+  if (category) { conditions.push('dpc.category_name = ?'); params.push(category); }
 
   const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
 
@@ -286,7 +286,7 @@ export const getRevenueTrendingQuery = async ({ layer, year, month }) => {
   if (layer === 'month' && year) {
     conditions.push('dd.year = ?'); params.push(Number(year));
   } else if (layer === 'day') {
-    if (year)  { conditions.push('dd.year = ?');  params.push(Number(year)); }
+    if (year) { conditions.push('dd.year = ?'); params.push(Number(year)); }
     if (month) { conditions.push('dd.month = ?'); params.push(Number(month)); }
   }
 
@@ -301,21 +301,21 @@ export const getRevenueTrendingQuery = async ({ layer, year, month }) => {
       dd.month_name AS monthName,
       CONCAT(dd.month_name, ' ', dd.year) AS monthYearLabel,
       ROUND(COALESCE(SUM(fs.order_quantity * dp.product_price), 0), 2) AS totalRevenue`;
-    groupBy  = 'dd.year, dd.month, dd.month_name';
-    orderBy  = 'dd.year ASC, dd.month ASC';
+    groupBy = 'dd.year, dd.month, dd.month_name';
+    orderBy = 'dd.year ASC, dd.month ASC';
   } else if (layer === 'day') {
     selectFields = `
       dd.full_date AS fullDate,
       ROUND(COALESCE(SUM(fs.order_quantity * dp.product_price), 0), 2) AS totalRevenue`;
-    groupBy  = 'dd.full_date';
-    orderBy  = 'dd.full_date ASC';
+    groupBy = 'dd.full_date';
+    orderBy = 'dd.full_date ASC';
   } else {
     // Default: year layer
     selectFields = `
       dd.year,
       ROUND(COALESCE(SUM(fs.order_quantity * dp.product_price), 0), 2) AS totalRevenue`;
-    groupBy  = 'dd.year';
-    orderBy  = 'dd.year ASC';
+    groupBy = 'dd.year';
+    orderBy = 'dd.year ASC';
   }
 
   const sql = `
@@ -342,9 +342,9 @@ export const getCountryStatsQuery = async ({ year, month, date, limit, sortBy = 
   const safeSort = allowedSorts.includes(sortBy) ? sortBy : 'Revenue';
 
   const orderExpr =
-    safeSort === 'Orders'     ? 's.totalOrders'   :
-    safeSort === 'ReturnRate' ? 'returnRate'      :
-                                's.totalRevenue';
+    safeSort === 'Orders' ? 's.totalOrders' :
+      safeSort === 'ReturnRate' ? 'returnRate' :
+        's.totalRevenue';
 
   const sql = `
     WITH sales_data AS (
@@ -388,14 +388,14 @@ export const getCountryStatsQuery = async ({ year, month, date, limit, sortBy = 
 export const getCustomerKPIsQuery = async () => {
   const sql = `
     SELECT
-      (SELECT COUNT(DISTINCT CustomerKey) FROM dim_customer) AS uniqueCustomers,
+      (SELECT COUNT(DISTINCT customer_key) FROM dim_customer) AS uniqueCustomers,
       ROUND(
-        SUM(fs.OrderQuantity * dp.ProductPrice) /
-        NULLIF((SELECT COUNT(DISTINCT CustomerKey) FROM dim_customer), 0),
+        SUM(fs.order_quantity * dp.product_price) /
+        NULLIF((SELECT COUNT(DISTINCT customer_key) FROM dim_customer), 0),
         2
       ) AS revenuePerCustomer
     FROM fact_sales fs
-    INNER JOIN dim_product dp ON fs.ProductKey = dp.ProductKey
+    INNER JOIN dim_product dp ON fs.product_key = dp.product_key
   `;
   const rows = await query(sql);
   return rows[0];
@@ -421,11 +421,11 @@ export const getOrdersByGenderQuery = async () => {
 export const getOrdersByOccupationQuery = async () => {
   const sql = `
     SELECT
-      dc.Occupation,
-      COUNT(DISTINCT fs.OrderNumber) AS orders
+      dc.occupation AS Occupation,
+      COUNT(DISTINCT fs.order_number) AS orders
     FROM fact_sales fs
-    INNER JOIN dim_customer dc ON fs.CustomerKey = dc.CustomerKey
-    GROUP BY dc.Occupation
+    INNER JOIN dim_customer dc ON fs.customer_key = dc.customer_key
+    GROUP BY dc.occupation
     ORDER BY orders DESC
   `;
   return query(sql);
@@ -437,15 +437,15 @@ export const getOrdersByIncomeLevelQuery = async () => {
   const sql = `
     SELECT
       CASE
-        WHEN dc.AnnualIncome < 40000  THEN 'Low'
-        WHEN dc.AnnualIncome < 80000  THEN 'Average'
-        WHEN dc.AnnualIncome < 120000 THEN 'High'
+        WHEN dc.annual_income < 40000  THEN 'Low'
+        WHEN dc.annual_income < 80000  THEN 'Average'
+        WHEN dc.annual_income < 120000 THEN 'High'
         ELSE 'Very High'
       END AS incomeLevel,
       COUNT(*) AS totalOrders,
-      MIN(dc.AnnualIncome) AS minIncome
+      MIN(dc.annual_income) AS minIncome
     FROM fact_sales fs
-    INNER JOIN dim_customer dc ON fs.CustomerKey = dc.CustomerKey
+    INNER JOIN dim_customer dc ON fs.customer_key = dc.customer_key
     GROUP BY incomeLevel
     ORDER BY minIncome ASC
   `;

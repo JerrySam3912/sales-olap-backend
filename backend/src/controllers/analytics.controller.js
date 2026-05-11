@@ -134,3 +134,21 @@ export const getSalesDetail = async (req, res) => {
     return sendError(res);
   }
 };
+
+export const getOrdersByIncomeLevel = async (req, res) => {
+  try {
+    const data = await analyticsService.getOrdersByIncomeLevel();
+    return sendSuccess(res, data);
+  } catch (error) {
+    return sendError(res);
+  }
+};
+
+export const getOrdersByOccupation = async (req, res) => {
+  try {
+    const data = await analyticsService.getOrdersByOccupation();
+    return sendSuccess(res, data);
+  } catch (error) {
+    return sendError(res);
+  }
+};

@@ -3,6 +3,8 @@ import {
   getExecutiveReturnQuantityQuery,
   getExecutiveSalesKPIsQuery,
   getGlobalReturnRateQuery,
+  getOrdersByIncomeLevelQuery,
+  getOrdersByOccupationQuery,
   getOverviewQuery,
   getRevenueTrendingQuery,
   getReturnRateQuery,
@@ -109,4 +111,12 @@ export const getSalesDetail = async ({ year, country, category, page, limit }) =
     page: pagination.page,
     limit: pagination.limit
   });
+};
+
+export const getOrdersByIncomeLevel = async () => {
+  return getOrdersByIncomeLevelQuery();
+};
+
+export const getOrdersByOccupation = async () => {
+  return getOrdersByOccupationQuery();
 };
