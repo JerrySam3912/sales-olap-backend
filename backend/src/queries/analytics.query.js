@@ -300,7 +300,8 @@ export const getRevenueTrendingQuery = async ({ layer, year, month }) => {
       dd.month AS monthNumber,
       dd.month_name AS monthName,
       CONCAT(dd.month_name, ' ', dd.year) AS monthYearLabel,
-      ROUND(COALESCE(SUM(fs.order_quantity * dp.product_price), 0), 2) AS totalRevenue`;
+      ROUND(COALESCE(SUM(fs.order_quantity * dp.product_price), 0), 2) AS totalRevenue,
+      COUNT(DISTINCT fs.customer_key) AS totalCustomers`;
     groupBy = 'dd.year, dd.month, dd.month_name';
     orderBy = 'dd.year ASC, dd.month ASC';
   } else if (layer === 'day') {
