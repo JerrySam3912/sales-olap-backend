@@ -5,6 +5,7 @@ import {
   getGlobalReturnRateQuery,
   getOrdersByIncomeLevelQuery,
   getOrdersByOccupationQuery,
+  getOrdersByGenderQuery,
   getOverviewQuery,
   getRevenueTrendingQuery,
   getReturnRateQuery,
@@ -120,3 +121,8 @@ export const getOrdersByIncomeLevel = async () => {
 export const getOrdersByOccupation = async () => {
   return getOrdersByOccupationQuery();
 };
+
+export const getOrdersByGender = async () => {
+  return getOrdersByGenderQuery();
+};
+

@@ -4,6 +4,7 @@ import {
   getExecutiveKPIs,
   getOrdersByIncomeLevel,
   getOrdersByOccupation,
+  getOrdersByGender,
   getOverview,
   getRevenueTrending,
   getReturnRate,
@@ -41,5 +42,7 @@ router.get('/return-rate', validateLimitQuery, getReturnRate);
 router.get('/sales-detail', validateSalesDetailQuery, getSalesDetail);
 router.get('/orders-by-income-level', getOrdersByIncomeLevel);
 router.get('/orders-by-occupation', getOrdersByOccupation);
+router.get('/orders-by-gender', getOrdersByGender);
 
 export default router;
+

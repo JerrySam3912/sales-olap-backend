@@ -407,12 +407,12 @@ export const getCustomerKPIsQuery = async () => {
 export const getOrdersByGenderQuery = async () => {
   const sql = `
     SELECT
-      dc.Gender,
-      COUNT(DISTINCT fs.OrderNumber) AS orders
+      dc.gender AS Gender,
+      COUNT(DISTINCT fs.order_number) AS orders
     FROM fact_sales fs
-    INNER JOIN dim_customer dc ON fs.CustomerKey = dc.CustomerKey
-    WHERE dc.Gender != 'U'
-    GROUP BY dc.Gender
+    INNER JOIN dim_customer dc ON fs.customer_key = dc.customer_key
+    WHERE dc.gender != 'U'
+    GROUP BY dc.gender
   `;
   return query(sql);
 };
@@ -458,20 +458,20 @@ export const getOrdersByIncomeLevelQuery = async () => {
 export const getTopProductsByOrdersQuery = async (limit) => {
   const sql = `
     SELECT
-      dp.ProductKey AS productKey,
-      dp.ProductName AS productName,
-      COUNT(DISTINCT fs.OrderNumber) AS totalOrders,
-      ROUND(SUM(fs.OrderQuantity * dp.ProductPrice), 2) AS totalRevenue,
+      dp.product_key AS productKey,
+      dp.product_name AS productName,
+      COUNT(DISTINCT fs.order_number) AS totalOrders,
+      ROUND(SUM(fs.order_quantity * dp.product_price), 2) AS totalRevenue,
       ROUND(
-        COALESCE(r.return_quantity, 0) / NULLIF(SUM(fs.OrderQuantity), 0) * 100, 2
+        COALESCE(r.return_quantity, 0) / NULLIF(SUM(fs.order_quantity), 0) * 100, 2
       ) AS returnRate
     FROM fact_sales fs
-    INNER JOIN dim_product dp ON fs.ProductKey = dp.ProductKey
+    INNER JOIN dim_product dp ON fs.product_key = dp.product_key
     LEFT JOIN (
-      SELECT ProductKey, SUM(ReturnQuantity) AS return_quantity
-      FROM fact_return GROUP BY ProductKey
-    ) r ON dp.ProductKey = r.ProductKey
-    GROUP BY dp.ProductKey, dp.ProductName, r.return_quantity
+      SELECT product_key, SUM(return_quantity) AS return_quantity
+      FROM fact_returns GROUP BY product_key
+    ) r ON dp.product_key = r.product_key
+    GROUP BY dp.product_key, dp.product_name, r.return_quantity
     ORDER BY totalOrders DESC
     LIMIT ?
   `;
@@ -484,24 +484,24 @@ export const getProfitTrendingQuery = async (productKey) => {
   const params = [];
   const conditions = [];
 
-  if (productKey) { conditions.push('fs.ProductKey = ?'); params.push(Number(productKey)); }
+  if (productKey) { conditions.push('fs.product_key = ?'); params.push(Number(productKey)); }
 
   const whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
 
   const sql = `
     SELECT
-      dd.Year,
-      dd.MonthNumber,
-      dd.MonthName,
-      ROUND(SUM(fs.OrderQuantity * dp.ProductPrice), 2)                          AS totalRevenue,
-      ROUND(SUM(fs.OrderQuantity * dp.ProductCost), 2)                           AS totalCost,
-      ROUND(SUM(fs.OrderQuantity * (dp.ProductPrice - dp.ProductCost)), 2)       AS totalProfit
+      dd.year,
+      dd.month AS monthNumber,
+      dd.month_name AS monthName,
+      ROUND(SUM(fs.order_quantity * dp.product_price), 2)                          AS totalRevenue,
+      ROUND(SUM(fs.order_quantity * dp.product_cost), 2)                           AS totalCost,
+      ROUND(SUM(fs.order_quantity * (dp.product_price - dp.product_cost)), 2)       AS totalProfit
     FROM fact_sales fs
-    INNER JOIN dim_product dp ON fs.ProductKey = dp.ProductKey
-    INNER JOIN dim_calendar dd ON fs.OrderDate  = dd.Date
+    INNER JOIN dim_product dp ON fs.product_key = dp.product_key
+    INNER JOIN dim_date dd ON fs.order_date = dd.full_date
     ${whereClause}
-    GROUP BY dd.Year, dd.MonthNumber, dd.MonthName
-    ORDER BY dd.Year ASC, dd.MonthNumber ASC
+    GROUP BY dd.year, dd.month, dd.month_name
+    ORDER BY dd.year ASC, dd.month ASC
   `;
   return query(sql, params);
 };

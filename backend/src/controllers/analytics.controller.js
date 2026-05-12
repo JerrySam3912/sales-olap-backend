@@ -152,3 +152,13 @@ export const getOrdersByOccupation = async (req, res) => {
     return sendError(res);
   }
 };
+
+export const getOrdersByGender = async (req, res) => {
+  try {
+    const data = await analyticsService.getOrdersByGender();
+    return sendSuccess(res, data);
+  } catch (error) {
+    return sendError(res);
+  }
+};
+
